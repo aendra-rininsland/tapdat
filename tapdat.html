@@ -10,6 +10,8 @@
   {{else}}
     {{> loginButtons}}
   {{/if}}
+
+  {{> usersData}}
 </body>
 
 <template name="questionnaire">
@@ -46,4 +48,32 @@
     <input type="submit" value="Save preferences" />
 
   </form>
+</template>
+
+<template name="faceGrid">
+
+</template>
+
+<template name="worm">
+
+</template>
+
+<template name="twitterStream">
+
+</template>
+
+<template name="usersData">
+  <div class="users-online">
+    {{totalCurrentUsers}} users online
+  </div>
+
+  <div class="voting-last-election">
+    {{#each onlineUsers}}
+      {{profile.postcode}}
+    {{/each}}
+  </div>
+
+  <div class="voting-this-election">
+
+  </div>
 </template>
