@@ -1,0 +1,49 @@
+<head>
+  <title>TapDat — Times Election Dashboard</title>
+</head>
+
+<body>
+  {{#if currentUser}}
+    {{#unless questionnaireComplete}}
+      {{> questionnaire}}
+    {{/unless}}
+  {{else}}
+    {{> loginButtons}}
+  {{/if}}
+</body>
+
+<template name="questionnaire">
+  <h1>But first...</h1>
+  <p>
+    Please fill out the following questionnaire. All data is kept anonymous and used only to improve TapDat.
+  </p>
+
+  <form class="new-user-questionnaire">
+    <h2>Who did you vote for last election?</h2>
+    <div class="voted-for-last-election">
+      {{#each parties}}
+      <label>{{this.name}}</label>
+      <input type="radio" name="lastElection" value="{{this.abbr}}" />
+      {{/each}}
+      <label>Abstained</label>
+      <input type="radio" name="lastElection" value="abstained" />
+    </div>
+
+    <h2>Who do you plan to vote for this election?</h2>
+    <div class="voting-for-this-election">
+      {{#each parties}}
+      <label>{{this.name}}</label>
+      <input type="radio" name="thisElection" value="{{this.abbr}}" />
+      {{/each}}
+      <label>Undecided</label>
+      <input type="radio" name="thisElection" value="undecided" />
+    </div>
+
+    <h2>Lastly, please enter your postcode:</h2>
+    <input type="text" name="postcode" />
+    <br />
+
+    <input type="submit" value="Save preferences" />
+
+  </form>
+</template>

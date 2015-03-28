@@ -1,0 +1,7 @@
+{
+  "packages": {
+    "rickshaw": {
+      "git": "https://github.com/aendrew/meteor-rickshaw.git"
+    }
+  }
+}
