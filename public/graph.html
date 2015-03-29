@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 		<link rel="stylesheet" href="css/graph.css"/>
 		<link rel="stylesheet" href="css/info.css"/>
 		<link rel="stylesheet" href="http://www.thetimes.co.uk/fonts/TimesClassicText-Smallcaps-Medium.css"/>
 		<link rel="stylesheet" href="http://www.thetimes.co.uk/fonts/TimesModern-Regular.css"/>
 		<link rel="stylesheet" href="http://www.thetimes.co.uk/fonts/TimesClassicText-Roman.css"/>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rickshaw/1.5.1/rickshaw.css" />
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/rickshaw/1.5.1/rickshaw.js"></script>
 		<script type="text/javascript" src="http://codeorigin.jquery.com/jquery-2.0.3.min.js"></script>
 		<script type="text/javascript" src="js/modernizr.js"></script>
+
 	</head>
 	<body>
 		<div id="wrapper">
-			<div class="worm-chart">&nbsp;</div>
+			<div id="worm-chart"></div>
 			<div class="data-section">
 				<div class="data-block">
 					<p>Users</p>
@@ -108,5 +113,69 @@
 			</div>
 		</div>
 		<script type="text/javascript" src="js/script.js"></script>
+		<script type="text/javascript">
+			// set up our data series with 150 random data points
+
+var seriesData = [ [], [], [], [], [], [], [], [], [] ];
+var random = new Rickshaw.Fixtures.RandomData(150);
+
+for (var i = 0; i < 150; i++) {
+	random.addData(seriesData);
+}
+
+var palette = new Rickshaw.Color.Palette( { scheme: 'classic9' } );
+
+// instantiate our graph!
+
+var graph = new Rickshaw.Graph( {
+	element: document.getElementById("worm-chart"),
+	width: $(window).width(),
+	height: $(window).height() * .45,
+	renderer: 'area',
+	stroke: true,
+	offset: 'wiggle',
+	preserve: true,
+	series: [
+		{
+			color: '#022397',
+			data: seriesData[0],
+			name: 'David Cameron'
+		}, {
+			color: '#ED1B24',
+			data: seriesData[1],
+			name: 'Ed Miliband'
+		}, {
+			color: '#FDBB30',
+			data: seriesData[2],
+			name: 'Nick Clegg'
+		}, {
+			color: '#722889',
+			data: seriesData[3],
+			name: 'Nigel Farage'
+		}, {
+			color: '#6AB023',
+			data: seriesData[4],
+			name: 'Natalie Bennett'
+		}, {
+			color: '#FFF95D',
+			data: seriesData[5],
+			name: 'Nicola Sturgeon'
+		}, {
+			color: '#3F8429',
+			data: seriesData[6],
+			name: 'Leanne Wood'
+		}
+	]
+} );
+
+graph.render();
+
+setInterval( function() {
+	random.removeData(seriesData);
+	random.addData(seriesData);
+	graph.update();
+
+}, 100 );
+		</script>
 	</body>
 </html>
