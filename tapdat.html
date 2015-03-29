@@ -1,11 +1,16 @@
 <head>
   <title>TapDat — Times Election Dashboard</title>
+  <link rel="stylesheet" href="http://www.thetimes.co.uk/fonts/TimesClassicText-Smallcaps-Medium.css"/>
+  <link rel="stylesheet" href="http://www.thetimes.co.uk/fonts/TimesModern-Regular.css"/>
 </head>
 
 <body>
   {{#if currentUser}}
     {{#unless questionnaireComplete}}
       {{> questionnaire}}
+
+    {{else}}
+      {{> faceGrid}}
     {{/unless}}
   {{else}}
     {{> loginButtons}}
@@ -51,11 +56,42 @@
 </template>
 
 <template name="faceGrid">
-
+  <div class="faceGrid">
+    <div id="faces">
+      <div class="face-box">
+        <div class="face libdem"></div>
+      </div>
+      <div class="face-box">
+        <div class="face labour"></div>
+      </div>
+      <div class="face-box">
+        <div class="face tory"></div>
+      </div>
+      <div class="face-box">
+        <div class="face green"></div>
+      </div>
+      <div class="face-box">
+        <div class="face ukip"></div>
+      </div>
+      <div class="face-box">
+        <div class="face snp"></div>
+      </div>
+      <div class="face-box">
+        <div class="face plaid"></div>
+      </div>
+      <div class="face-box">
+        <a href="graph.html">
+          <div class="face worm"></div>
+        </a>
+      </div>
+    </div>
+  </div>
 </template>
 
 <template name="worm">
-
+  {{#constant}}
+  <div id="the-worm"></div>
+  {{/constant}}
 </template>
 
 <template name="twitterStream">
@@ -68,12 +104,12 @@
   </div>
 
   <div class="voting-last-election">
-    {{#each onlineUsers}}
-      {{profile.postcode}}
-    {{/each}}
+    <h4>People online: last election</h4>
+    <div class="people-last-election"></div>
   </div>
 
   <div class="voting-this-election">
-
+    <h4>People online: voting intention</h4>
+    <div class="people-this-election"></div>
   </div>
 </template>
