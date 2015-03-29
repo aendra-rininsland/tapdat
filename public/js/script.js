@@ -36,8 +36,18 @@ var faceScore = {
 	'plaid': 0
 };
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 
 $(document).ready(function() {
+
+	setInterval(function() {
+		var number = parseInt($('.data-section .data-block:first-child h1').text().replace(",",""));
+		number++;
+		number = numberWithCommas(number);
+		$('.data-section .data-block:first-child h1').text(number);
+	}, 3000);
 
 	adjust();
 
@@ -142,3 +152,4 @@ function faceDrop() {
 		calcScore();
 	});
 }
+
