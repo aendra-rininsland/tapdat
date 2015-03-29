@@ -32,6 +32,22 @@ if (Meteor.isClient) {
       return false;
     }
   });
+
+  Template.usersData.helpers({
+    totalCurrentUsers: function(){
+      return Meteor.users.find({ 'status.online': true }).count();
+    },
+    onlineUsers: function() {
+      return Meteor.users.find({ 'status.online': true }, {
+          fields: {
+            'profile.lastElection': 1,
+            'profile.thisElection': 1
+          }
+      });
+    }
+  });
+
+  Meteor.subscribe('onlineUsers');
 }
 
 if (Meteor.isServer) {
@@ -55,5 +71,14 @@ if (Meteor.isServer) {
         }
       });
     }
+  });
+
+  Meteor.publish('onlineUsers', function() {
+    return Meteor.users.find({ 'status.online': true, 'profile.questionnaireComplete': true }, {
+      fields: {
+        'profile.lastElection': 1,
+        'profile.thisElection': 1
+      }
+    });
   });
 }
