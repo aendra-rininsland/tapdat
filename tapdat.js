@@ -1,5 +1,6 @@
 if (Meteor.isClient) {
   Session.setDefault('isFaces', true);
+  Votes = new Mongo.Collection('votes');
 
   Template.body.helpers({
     questionnaireComplete: function(){
@@ -60,6 +61,13 @@ if (Meteor.isClient) {
   Template.body.helpers({
     isFaces: function() {
       return Session.get('isFaces');
+    }
+  });
+
+
+  Template.faceGrid.gestures({
+    'press .face': function(e, tem) {
+      console.log('yay');
     }
   });
 
@@ -127,7 +135,6 @@ if (Meteor.isClient) {
       }
     });
 
-
     $('.face-box').on('click', function() {
       if($(this).find('div').hasClass('worm')) {
         //go to graph
@@ -135,7 +142,12 @@ if (Meteor.isClient) {
         var party = $(this).find('div').attr('class').replace('face ','');
         heart[party]++;
         if(faceScore[party] > -2 && faceScore[party] < 2) {
-          faceScore[party]++;
+          // Meteor.call('submitQuestionnaire', party, 1);
+          Votes.insert({
+            party: party,
+            value: 1,
+            timestamp: Date.now()
+          });
         }
         $(this).append('<div class="heart"></div>')
         setTimeout(function() {
@@ -196,38 +208,84 @@ if (Meteor.isClient) {
 
   };
 
-  // Template.worm.rendered = function () {
-  //  this.node = this.find('#the-worm');
-  // //  var graph = new Rickshaw.Graph( {
-  // //   element: document.querySelector("#the-worm"),
-  // //   width: 300,
-  // //   height: 200,
-  // //   series: [{
-  // //     color: 'steelblue',
-  // //     data: [
-  // //            { x: 0, y: 40 },
-  // //            { x: 1, y: 49 },
-  // //            { x: 2, y: 38 },
-  // //            { x: 3, y: 30 },
-  // //            { x: 4, y: 32 }
-  // //        ]
-  // //    }]
-  // //  });
-  //  //
-  // //  graph.render();
-  //
-  // // var
-  //  this.autorun(function (tracker) {
-  //    graph.update();
+  Template.worm.rendered = function () {
+    $('#the-worm').attr('width', $(window).width()).attr('height', $(window).height());
+  //  var graph = new Rickshaw.Graph( {
+  //   element: document.querySelector("#the-worm"),
+  //   width: 300,
+  //   height: 200,
+  //   series: [{
+  //     color: 'steelblue',
+  //     data: [
+  //            { x: 0, y: 40 },
+  //            { x: 1, y: 49 },
+  //            { x: 2, y: 38 },
+  //            { x: 3, y: 30 },
+  //            { x: 4, y: 32 }
+  //        ]
+  //    }]
   //  });
-  // };
+   //
+  //  graph.render();
 
-  Meteor.subscribe('onlineUsers');
+    var entries = Votes.find({timestamp: {$lt: Date.now()}});
+    var parties = [
+      'labour',
+      'tory',
+      'libdem',
+      'ukip',
+      'green',
+      'snp',
+      'plaid'
+    ];
+
+    // var cols = [];
+    //
+    // parties.forEach(function(v){
+    //   var col = [
+    //     v
+    //   ];
+    //   col.push(Votes.find({timestamp: {$lt: Date.now()}, party: v}).count());
+    //   cols.push([v]);
+    //   console.dir(col);
+    //   Session.set(v, col);
+    // });
+    //
+    // console.dir(cols);
+
+    // Random data
+    var line1 = new TimeSeries();
+    var line2 = new TimeSeries();
+    var line3 = new TimeSeries();
+    var line4 = new TimeSeries();
+    var line5 = new TimeSeries();
+    var line6 = new TimeSeries();
+    setInterval(function() {
+      line1.append(new Date().getTime(), Math.random());
+      line2.append(new Date().getTime(), Math.random());
+      line3.append(new Date().getTime(), Math.random());
+      line4.append(new Date().getTime(), Math.random());
+      line5.append(new Date().getTime(), Math.random());
+      line6.append(new Date().getTime(), Math.random());
+    }, 1000);
+
+    var smoothie = new SmoothieChart(/*{ grid: { strokeStyle: '#ED1B24', fillStyle: '#ED1B24', lineWidth: 1, millisPerLine: 250, verticalSections: 6 } }*/);
+    smoothie.addTimeSeries(line1, { strokeStyle: '#ED1B24', fillStyle: '#ED1B24', lineWidth: 3 });
+    smoothie.addTimeSeries(line2, { strokeStyle: '#022397', fillStyle: '#022397', lineWidth: 3 });
+    smoothie.addTimeSeries(line3, { strokeStyle: '#FDBB30', fillStyle: '#FDBB30', lineWidth: 3 });
+    smoothie.addTimeSeries(line4, { strokeStyle: '#722889', fillStyle: '#722889', lineWidth: 3 });
+    smoothie.addTimeSeries(line5, { strokeStyle: '#6AB023', fillStyle: '#6AB023', lineWidth: 3 });
+    smoothie.addTimeSeries(line6, { strokeStyle: '#d8ce3d', fillStyle: '#d8ce3d', lineWidth: 3 });
+
+    smoothie.streamTo(document.getElementById("the-worm"), 1000);
+  };
+
+  // Meteor.subscribe('onlineUsers');
 }
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
-    // code to run on server at startup
+    Votes = new Mongo.Collection('votes');
   });
 
   Meteor.methods({
@@ -245,15 +303,22 @@ if (Meteor.isServer) {
           'profile.questionnaireComplete': true
         }
       });
+    },
+    addVote: function(party, direction) {
+      Votes.insert({
+        party: party,
+        value: direction,
+        timestamp: Date.now()
+      });
     }
   });
 
-  Meteor.publish('onlineUsers', function() {
-    return Meteor.users.find({ 'status.online': true, 'profile.questionnaireComplete': true }, {
-      fields: {
-        'profile.lastElection': 1,
-        'profile.thisElection': 1
-      }
-    });
-  });
+  // Meteor.publish('onlineUsers', function() {
+  //   return Meteor.users.find({ 'status.online': true, 'profile.questionnaireComplete': true }, {
+  //     fields: {
+  //       'profile.lastElection': 1,
+  //       'profile.thisElection': 1
+  //     }
+  //   });
+  // });
 }
