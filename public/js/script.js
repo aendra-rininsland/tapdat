@@ -82,18 +82,30 @@ $(document).ready(function() {
 		calcScore();
 	});
 
+	$('#nav .button').on('click', function() {
+		if($(this).find('p').text() == 'Info') {
+			$('#info').show();
+		}
+	});
+
+	$('.exit').on('click', function() {
+		$('#info').hide();
+	});
+
 });
 
 function adjust() {
+	$('#faces').height($(window).height()*0.93);
+	$('#nav').height($(window).height()*0.07);
 	if(Modernizr.mq('(orientation: landscape)')) {
 		$('.face-box').css({
 			'width': $(window).width()/4,
-			'height': $(window).height()/2
+			'height': $('#faces').height()/2
 		});
 	} else {
 		$('.face-box').css({
 			'width': $(window).width()/2,
-			'height': $(window).height()/4
+			'height': $('#faces').height()/4
 		});
 	}
 }
