@@ -37,15 +37,111 @@ if (Meteor.isClient) {
     totalCurrentUsers: function(){
       return Meteor.users.find({ 'status.online': true }).count();
     },
-    onlineUsers: function() {
-      return Meteor.users.find({ 'status.online': true }, {
-          fields: {
-            'profile.lastElection': 1,
-            'profile.thisElection': 1
-          }
-      });
-    }
+    // onlineUsers: function() {
+    //   return Meteor.users.find({ 'status.online': true }, {
+    //       fields: {
+    //         'profile.lastElection': 1,
+    //         'profile.thisElection': 1
+    //       }
+    //   });
+    // }
   });
+
+  Template.faceGrid.rendered = function () {
+    var orientation = 'portrait';
+    var heart = {
+    	'labour': 0,
+    	'tory': 0,
+    	'libdem': 0,
+    	'ukip': 0,
+    	'green': 0,
+    	'snp': 0,
+    	'plaid': 0
+    };
+    var hate = {
+    	'labour': 0,
+    	'tory': 0,
+    	'libdem': 0,
+    	'ukip': 0,
+    	'green': 0,
+    	'snp': 0,
+    	'plaid': 0
+    };
+    var score = {
+    	'labour': 0,
+    	'tory': 0,
+    	'libdem': 0,
+    	'ukip': 0,
+    	'green': 0,
+    	'snp': 0,
+    	'plaid': 0
+    };
+    var faceScore = {
+    	'labour': 0,
+    	'tory': 0,
+    	'libdem': 0,
+    	'ukip': 0,
+    	'green': 0,
+    	'snp': 0,
+    	'plaid': 0
+    };
+
+    $.each(score, function(i, object) {
+      score[i] = heart[i]-hate[i];
+    });
+    //get face according to score
+    $.each($('.face'), function(i, object) {
+      var party = $(object).attr('class').replace('face ','');
+      if(party != 'worm') {
+        var index = faceScore[party];
+        var image = 'url(assets/'+party+index+'.jpg)';
+        $(object).css('background-image', image);
+      } else {
+        $(object).css('background-image', 'url(assets/worm.jpg)');
+      }
+    });
+
+
+    $('.face-box').on('click', function() {
+      if($(this).find('div').hasClass('worm')) {
+        //go to graph
+      } else {
+        var party = $(this).find('div').attr('class').replace('face ','');
+        heart[party]++;
+        if(faceScore[party] > -2 && faceScore[party] < 2) {
+          faceScore[party]++;
+        }
+        $(this).append('<div class="heart"></div>')
+        setTimeout(function() {
+          $('.heart').fadeOut(400, function() {
+            $(this).remove();
+          });
+        }, 300);
+        calcScore();
+      }
+    });
+
+  };
+
+  Template.worm.rendered = function () {
+   this.node = this.find('#the-worm');
+   var graph = new Rickshaw.Graph( {
+     element: document.querySelector("#the-worm"),
+     width: 300,
+     height: 200,
+     series: [{
+         color: 'steelblue',
+         data: [
+             { x: 0, y: 40 },
+             { x: 1, y: 49 },
+             { x: 2, y: 38 },
+             { x: 3, y: 30 },
+             { x: 4, y: 32 } ]
+     }]
+   });
+
+   graph.render();
+  };
 
   Meteor.subscribe('onlineUsers');
 }

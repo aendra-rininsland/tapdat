@@ -10,3 +10,5 @@ accounts-twitter
 accounts-ui
 fourseven:scss
 mizzao:user-status
+jquery
+autopublish
