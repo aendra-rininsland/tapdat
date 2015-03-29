@@ -1,6 +1,5 @@
 if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault('counter', 0);
+  Session.setDefault('isFaces', true);
 
   Template.body.helpers({
     questionnaireComplete: function(){
@@ -47,6 +46,23 @@ if (Meteor.isClient) {
     // }
   });
 
+  Template.tabs.events({
+    'click .participate': function(event) {
+      Session.set('isFaces', true);
+      return false;
+    },
+    'click .watch': function(event) {
+      Session.set('isFaces', false);
+      return false;
+    }
+  });
+
+  Template.body.helpers({
+    isFaces: function() {
+      return Session.get('isFaces');
+    }
+  });
+
   Template.faceGrid.rendered = function () {
     var orientation = 'portrait';
     var heart = {
@@ -86,9 +102,19 @@ if (Meteor.isClient) {
     	'plaid': 0
     };
 
+    adjust();
+
+    $(window).on('resize', function() {
+      adjust();
+    });
+
+    calcScore();
+    setInterval(function() {faceDrop();}, 15000);
+
     $.each(score, function(i, object) {
       score[i] = heart[i]-hate[i];
     });
+
     //get face according to score
     $.each($('.face'), function(i, object) {
       var party = $(object).attr('class').replace('face ','');
@@ -121,27 +147,80 @@ if (Meteor.isClient) {
       }
     });
 
+    function adjust() {
+    	if(window.matchMedia("(orientation: landscape)").matches) {
+    		$('.face-box').css({
+    			'width': $(window).width()/4,
+    			'height': $(window).height()/2
+    		});
+    	} else {
+    		$('.face-box').css({
+    			'width': $(window).width()/2,
+    			'height': $(window).height()/4
+    		});
+    	}
+    }
+
+    function calcScore() {
+    	var scoreArray = [];
+    	var max;
+    	var min;
+    	$.each(score, function(i, object) {
+    		score[i] = heart[i]-hate[i];
+    	});
+    	//get face according to score
+    	$.each($('.face'), function(i, object) {
+    		var party = $(object).attr('class').replace('face ','');
+    		if(party != 'worm') {
+    			var index = faceScore[party];
+    			var image = 'url(assets/'+party+index+'.jpg)';
+    			$(object).css('background-image', image);
+    		} else {
+    			$(object).css('background-image', 'url(assets/worm.jpg)');
+    		};
+    	});
+    }
+
+    function faceDrop() {
+    	$.each($('.face'), function(i, object) {
+    		var party = $(object).attr('class').replace('face ','');
+    		if(faceScore[party] < 0 && faceScore[party] >= -2) {
+    			faceScore[party]++;
+    		};
+    		if(faceScore[party] > 0 && faceScore[party] <= 2) {
+    			faceScore[party]--;
+    		};
+    		calcScore();
+    	});
+    }
+
   };
 
-  Template.worm.rendered = function () {
-   this.node = this.find('#the-worm');
-   var graph = new Rickshaw.Graph( {
-     element: document.querySelector("#the-worm"),
-     width: 300,
-     height: 200,
-     series: [{
-         color: 'steelblue',
-         data: [
-             { x: 0, y: 40 },
-             { x: 1, y: 49 },
-             { x: 2, y: 38 },
-             { x: 3, y: 30 },
-             { x: 4, y: 32 } ]
-     }]
-   });
-
-   graph.render();
-  };
+  // Template.worm.rendered = function () {
+  //  this.node = this.find('#the-worm');
+  // //  var graph = new Rickshaw.Graph( {
+  // //   element: document.querySelector("#the-worm"),
+  // //   width: 300,
+  // //   height: 200,
+  // //   series: [{
+  // //     color: 'steelblue',
+  // //     data: [
+  // //            { x: 0, y: 40 },
+  // //            { x: 1, y: 49 },
+  // //            { x: 2, y: 38 },
+  // //            { x: 3, y: 30 },
+  // //            { x: 4, y: 32 }
+  // //        ]
+  // //    }]
+  // //  });
+  //  //
+  // //  graph.render();
+  //
+  // // var
+  //  this.autorun(function (tracker) {
+  //    graph.update();
+  //  });
+  // };
 
   Meteor.subscribe('onlineUsers');
 }

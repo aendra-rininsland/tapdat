@@ -10,7 +10,12 @@
       {{> questionnaire}}
 
     {{else}}
-      {{> faceGrid}}
+      {{#if isFaces}}
+        {{> faceGrid}}
+      {{else}}
+        {{> worm}}
+      {{/if}}
+      {{> tabs}}
     {{/unless}}
   {{else}}
     {{> loginButtons}}
@@ -89,9 +94,7 @@
 </template>
 
 <template name="worm">
-  {{#constant}}
   <div id="the-worm"></div>
-  {{/constant}}
 </template>
 
 <template name="twitterStream">
@@ -111,5 +114,16 @@
   <div class="voting-this-election">
     <h4>People online: voting intention</h4>
     <div class="people-this-election"></div>
+  </div>
+</template>
+
+<template name="tabs">
+  <div class="ui secondary pointing menu">
+    <a class="active item participate">
+      <i class="home icon"></i> Participate
+    </a>
+    <a class="item watch">
+      <i class="mail icon"></i> Watch
+    </a>
   </div>
 </template>
