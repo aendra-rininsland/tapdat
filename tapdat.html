@@ -8,7 +8,6 @@
   {{#if currentUser}}
     {{#unless questionnaireComplete}}
       {{> questionnaire}}
-
     {{else}}
       {{#if isFaces}}
         {{> faceGrid}}
@@ -20,8 +19,6 @@
   {{else}}
     {{> loginButtons}}
   {{/if}}
-
-  {{> usersData}}
 </body>
 
 <template name="questionnaire">
@@ -34,7 +31,7 @@
     <h2>Who did you vote for last election?</h2>
     <div class="voted-for-last-election">
       {{#each parties}}
-      <label>{{this.name}}</label>
+      <label>{{this.party}}</label>
       <input type="radio" name="lastElection" value="{{this.abbr}}" />
       {{/each}}
       <label>Abstained</label>
@@ -44,8 +41,10 @@
     <h2>Who do you plan to vote for this election?</h2>
     <div class="voting-for-this-election">
       {{#each parties}}
-      <label>{{this.name}}</label>
+      {{#unless this.party 'Ukip'}}
+      <label>{{this.party}}</label>
       <input type="radio" name="thisElection" value="{{this.abbr}}" />
+      {{/unless}}
       {{/each}}
       <label>Undecided</label>
       <input type="radio" name="thisElection" value="undecided" />
@@ -61,44 +60,42 @@
 </template>
 
 <template name="faceGrid">
-  <div class="faceGrid">
-    <div id="faces">
-      <div class="face-box">
-        <div class="face libdem"></div>
-      </div>
-      <div class="face-box">
-        <div class="face labour"></div>
-      </div>
-      <div class="face-box">
-        <div class="face tory"></div>
-      </div>
-      <div class="face-box">
-        <div class="face green"></div>
-      </div>
-      <div class="face-box">
-        <div class="face ukip"></div>
-      </div>
-      <div class="face-box">
-        <div class="face snp"></div>
-      </div>
-      <div class="face-box">
-        <div class="face plaid"></div>
-      </div>
-      <div class="face-box">
-        <a href="graph.html">
-          <div class="face worm"></div>
-        </a>
-      </div>
+  <div class="main container">
+    <div class="ui cards four wide">
+    {{#each candidates}}
+      <a class="card">
+        <div class="image">
+          <img src="assets/{{this.photo}}" />
+        </div>
+        <div class="content">
+          <div class="header">{{this.name}}</div>
+          <div class="meta">
+            {{this.party}}
+          </div>
+        </div>
+      </a>
+    {{/each}}
+      <a class="card">
+        <div class="image">
+          <img src="assets/worm.jpg" />
+        </div>
+        <div class="content">
+          <div class="header">Watch live data</div>
+        </div>
+      </a>
     </div>
   </div>
 </template>
 
 <template name="worm">
-  <canvas id="the-worm"></canvas>
+  <div id="the-worm"></div>
+  {{allTheVotes}}
+  {{> usersData}}
+  {{> twitterStream}}
 </template>
 
 <template name="twitterStream">
-
+  twitter
 </template>
 
 <template name="usersData">
@@ -118,12 +115,8 @@
 </template>
 
 <template name="tabs">
-  <div class="ui secondary pointing menu">
-    <a class="active item participate">
-      <i class="home icon"></i> Participate
-    </a>
-    <a class="item watch">
-      <i class="mail icon"></i> Watch
-    </a>
+  <div class="ui secondary fluid two item pointing menu">
+    <a class="active item participate">Participate</a>
+    <a class="item watch">Watch</a>
   </div>
 </template>

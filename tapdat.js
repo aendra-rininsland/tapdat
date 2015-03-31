@@ -1,6 +1,24 @@
+'use strict';
+
+var Votes = new Mongo.Collection('votes');
+
+var parties = [
+  {name: 'David Cameron', party: 'Conservative', abbr: 'Con', color: '#022397', photo: 'tory_square.jpg'},
+  {name: 'Ed Miliband', party: 'Labour', abbr: 'Lab', color: '#ED1B24', photo: 'labour_square.jpg'},
+  {name: 'Nick Clegg', party: 'Liberal Democrats', abbr: 'LD', color: '#FDBB30', photo: 'libdem_square.jpg'},
+  {name: 'Nigel Farage', party: 'Ukip', abbr: 'Ukip', color: '#722889', photo: 'ukip_square.jpg'},
+  {name: 'Natalie Bennett', party: 'Green', abbr: 'Grn', color: '#6AB023', photo: 'green_square.jpg'},
+  {name: 'Nicola Sturgeon', party: 'SNP', abbr: 'SNP', color: '#6AB023', photo: 'snp_square.jpg'},
+  {name: 'Leanne Wood', party: 'Plaid Cymru', abbr: 'PC', color: '#6AB023', photo: 'plaid_square.jpg'}
+];
+
 if (Meteor.isClient) {
   Session.setDefault('isFaces', true);
-  Votes = new Mongo.Collection('votes');
+  Meteor.subscribe('onlineUsers');
+  Meteor.subscribe('recentVotes', function(){
+    var ts = new Date();
+    var a = Votes.find({'timestamp': {$gt: ts - 500, $lt: ts + 500} });
+  });
 
   Template.body.helpers({
     questionnaireComplete: function(){
@@ -10,14 +28,7 @@ if (Meteor.isClient) {
 
   Template.questionnaire.helpers({
     parties: function() {
-      return [
-        {name: 'Conservative', abbr: 'Con', color: '#022397'},
-        {name: 'Labour', abbr: 'Con', color: '#ED1B24'},
-        {name: 'Liberal Democrats', abbr: 'Con', color: '#FDBB30'},
-        {name: 'Ukip', abbr: 'Con', color: '#722889'},
-        {name: 'Green', abbr: 'Con', color: '#6AB023'},
-        {name: 'SNP', abbr: 'Con', color: '#6AB023'}
-      ];
+      return parties;
     }
   });
 
@@ -37,23 +48,24 @@ if (Meteor.isClient) {
     totalCurrentUsers: function(){
       return Meteor.users.find({ 'status.online': true }).count();
     },
-    // onlineUsers: function() {
-    //   return Meteor.users.find({ 'status.online': true }, {
-    //       fields: {
-    //         'profile.lastElection': 1,
-    //         'profile.thisElection': 1
-    //       }
-    //   });
-    // }
+    onlineUsers: function() {
+      return onlineUsers;
+    }
   });
 
   Template.tabs.events({
     'click .participate': function(event) {
       Session.set('isFaces', true);
+      $('.participate').addClass('active');
+      $('.watch').removeClass('active');
+
       return false;
     },
     'click .watch': function(event) {
       Session.set('isFaces', false);
+      $('.participate').removeClass('active');
+      $('.watch').addClass('active');
+
       return false;
     }
   });
@@ -66,179 +78,41 @@ if (Meteor.isClient) {
 
 
   Template.faceGrid.gestures({
-    'press .face': function(e, tem) {
-      console.log('yay');
+    'swipe .card': function(e, tem) {
+      e.preventDefault();
+      if (this.abbr) {
+        console.log('-1 ' + this.abbr);
+        Meteor.call('addVote', {
+          party: this.abbr,
+          direction: -1
+        });
+      }
     }
   });
 
-  Template.faceGrid.rendered = function () {
-    var orientation = 'portrait';
-    var heart = {
-    	'labour': 0,
-    	'tory': 0,
-    	'libdem': 0,
-    	'ukip': 0,
-    	'green': 0,
-    	'snp': 0,
-    	'plaid': 0
-    };
-    var hate = {
-    	'labour': 0,
-    	'tory': 0,
-    	'libdem': 0,
-    	'ukip': 0,
-    	'green': 0,
-    	'snp': 0,
-    	'plaid': 0
-    };
-    var score = {
-    	'labour': 0,
-    	'tory': 0,
-    	'libdem': 0,
-    	'ukip': 0,
-    	'green': 0,
-    	'snp': 0,
-    	'plaid': 0
-    };
-    var faceScore = {
-    	'labour': 0,
-    	'tory': 0,
-    	'libdem': 0,
-    	'ukip': 0,
-    	'green': 0,
-    	'snp': 0,
-    	'plaid': 0
-    };
-
-    adjust();
-
-    $(window).on('resize', function() {
-      adjust();
-    });
-
-    calcScore();
-    setInterval(function() {faceDrop();}, 15000);
-
-    $.each(score, function(i, object) {
-      score[i] = heart[i]-hate[i];
-    });
-
-    //get face according to score
-    $.each($('.face'), function(i, object) {
-      var party = $(object).attr('class').replace('face ','');
-      if(party != 'worm') {
-        var index = faceScore[party];
-        var image = 'url(assets/'+party+index+'.jpg)';
-        $(object).css('background-image', image);
-      } else {
-        $(object).css('background-image', 'url(assets/worm.jpg)');
+  Template.faceGrid.events({
+    'click .card': function(e, tem) {
+      e.preventDefault();
+      if (this.abbr) {
+        console.log('+1 ' + this.abbr);
+        Meteor.call('addVote', {
+          party: this.abbr,
+          direction: +1
+        });
       }
-    });
-
-    $('.face-box').on('click', function() {
-      if($(this).find('div').hasClass('worm')) {
-        //go to graph
-      } else {
-        var party = $(this).find('div').attr('class').replace('face ','');
-        heart[party]++;
-        if(faceScore[party] > -2 && faceScore[party] < 2) {
-          // Meteor.call('submitQuestionnaire', party, 1);
-          Votes.insert({
-            party: party,
-            value: 1,
-            timestamp: Date.now()
-          });
-        }
-        $(this).append('<div class="heart"></div>')
-        setTimeout(function() {
-          $('.heart').fadeOut(400, function() {
-            $(this).remove();
-          });
-        }, 300);
-        calcScore();
-      }
-    });
-
-    function adjust() {
-    	if(window.matchMedia("(orientation: landscape)").matches) {
-    		$('.face-box').css({
-    			'width': $(window).width()/4,
-    			'height': $(window).height()/2
-    		});
-    	} else {
-    		$('.face-box').css({
-    			'width': $(window).width()/2,
-    			'height': $(window).height()/4
-    		});
-    	}
     }
+  });
 
-    function calcScore() {
-    	var scoreArray = [];
-    	var max;
-    	var min;
-    	$.each(score, function(i, object) {
-    		score[i] = heart[i]-hate[i];
-    	});
-    	//get face according to score
-    	$.each($('.face'), function(i, object) {
-    		var party = $(object).attr('class').replace('face ','');
-    		if(party != 'worm') {
-    			var index = faceScore[party];
-    			var image = 'url(assets/'+party+index+'.jpg)';
-    			$(object).css('background-image', image);
-    		} else {
-    			$(object).css('background-image', 'url(assets/worm.jpg)');
-    		};
-    	});
+  Template.faceGrid.helpers({
+    candidates: function() {
+      return parties;
     }
-
-    function faceDrop() {
-    	$.each($('.face'), function(i, object) {
-    		var party = $(object).attr('class').replace('face ','');
-    		if(faceScore[party] < 0 && faceScore[party] >= -2) {
-    			faceScore[party]++;
-    		};
-    		if(faceScore[party] > 0 && faceScore[party] <= 2) {
-    			faceScore[party]--;
-    		};
-    		calcScore();
-    	});
-    }
-
-  };
+  });
 
   Template.worm.rendered = function () {
-    $('#the-worm').attr('width', $(window).width()).attr('height', $(window).height());
-  //  var graph = new Rickshaw.Graph( {
-  //   element: document.querySelector("#the-worm"),
-  //   width: 300,
-  //   height: 200,
-  //   series: [{
-  //     color: 'steelblue',
-  //     data: [
-  //            { x: 0, y: 40 },
-  //            { x: 1, y: 49 },
-  //            { x: 2, y: 38 },
-  //            { x: 3, y: 30 },
-  //            { x: 4, y: 32 }
-  //        ]
-  //    }]
-  //  });
-   //
-  //  graph.render();
 
-    var entries = Votes.find({timestamp: {$lt: Date.now()}});
-    var parties = [
-      'labour',
-      'tory',
-      'libdem',
-      'ukip',
-      'green',
-      'snp',
-      'plaid'
-    ];
-
+    // var entries = Votes.find({timestamp: {$lt: Date.now()}});
+    //
     // var cols = [];
     //
     // parties.forEach(function(v){
@@ -252,47 +126,25 @@ if (Meteor.isClient) {
     // });
     //
     // console.dir(cols);
-
-    // Random data
-    var line1 = new TimeSeries();
-    var line2 = new TimeSeries();
-    var line3 = new TimeSeries();
-    var line4 = new TimeSeries();
-    var line5 = new TimeSeries();
-    var line6 = new TimeSeries();
-    setInterval(function() {
-      line1.append(new Date().getTime(), Math.random());
-      line2.append(new Date().getTime(), Math.random());
-      line3.append(new Date().getTime(), Math.random());
-      line4.append(new Date().getTime(), Math.random());
-      line5.append(new Date().getTime(), Math.random());
-      line6.append(new Date().getTime(), Math.random());
-    }, 1000);
-
-    var smoothie = new SmoothieChart(/*{ grid: { strokeStyle: '#ED1B24', fillStyle: '#ED1B24', lineWidth: 1, millisPerLine: 250, verticalSections: 6 } }*/);
-    smoothie.addTimeSeries(line1, { strokeStyle: '#ED1B24', fillStyle: '#ED1B24', lineWidth: 3 });
-    smoothie.addTimeSeries(line2, { strokeStyle: '#022397', fillStyle: '#022397', lineWidth: 3 });
-    smoothie.addTimeSeries(line3, { strokeStyle: '#FDBB30', fillStyle: '#FDBB30', lineWidth: 3 });
-    smoothie.addTimeSeries(line4, { strokeStyle: '#722889', fillStyle: '#722889', lineWidth: 3 });
-    smoothie.addTimeSeries(line5, { strokeStyle: '#6AB023', fillStyle: '#6AB023', lineWidth: 3 });
-    smoothie.addTimeSeries(line6, { strokeStyle: '#d8ce3d', fillStyle: '#d8ce3d', lineWidth: 3 });
-
-    smoothie.streamTo(document.getElementById("the-worm"), 1000);
   };
 
-  // Meteor.subscribe('onlineUsers');
+  Template.worm.helpers({
+    allTheVotes: function() {
+      return Votes.find({}).count();
+    }
+  });
 }
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
-    Votes = new Mongo.Collection('votes');
+    //
   });
 
   Meteor.methods({
     submitQuestionnaire: function(values) {
       // Make sure the user is logged in before inserting a task
       if (! Meteor.userId()) {
-        throw new Meteor.Error("not-authorized");
+        throw new Meteor.Error('not-authorized');
       }
 
       Meteor.users.update(this.userId, { $set:
@@ -304,21 +156,25 @@ if (Meteor.isServer) {
         }
       });
     },
-    addVote: function(party, direction) {
+
+    addVote: function(args) {
       Votes.insert({
-        party: party,
-        value: direction,
+        party: args.party,
+        value: args.direction,
         timestamp: Date.now()
       });
     }
   });
 
-  // Meteor.publish('onlineUsers', function() {
-  //   return Meteor.users.find({ 'status.online': true, 'profile.questionnaireComplete': true }, {
-  //     fields: {
-  //       'profile.lastElection': 1,
-  //       'profile.thisElection': 1
-  //     }
-  //   });
-  // });
+  Meteor.publish('onlineUsers', function() {
+    return Meteor.users.find({'status.online': true});
+  });
+
+  Meteor.publish('recentVotes', function(ts) {
+    return Votes.find({'timestamp': {$gt: ts - 500, $lt: ts + 500} });
+  });
+
+  Meteor.publish('allTheVotes', function() {
+    return Votes.find();
+  });
 }

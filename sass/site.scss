@@ -3,112 +3,114 @@
  *
  */
 
-.graph {
-  html, body, #wrapper {
-  	margin:0;
-  	padding:0;
-  	height: 100%;
-  }
+// .graph {
+//   html, body, #wrapper {
+//   	margin:0;
+//   	padding:0;
+//   	height: 100%;
+//   }
+//
+//   #wrapper {
+//   	overflow-y:scroll;
+//   	-webkit-overflow-scrolling: touch;
+//   	position:relative;
+//   	width:100%;
+//   	color:white;
+//   	background-color:#242424;
+//   }
+//
+//   .worm-chart {
+//   	margin-top:30px;
+//   	height:60%;
+//   	width:100%;
+//   	background-color:red;
+//   }
+//
+//   .data-block {
+//   	margin-left:20px;
+//   	margin-top:20px;
+//   	width:30%;
+//   	border-top:2px solid grey;
+//   }
+//
+//   .data-block p {
+//   	color:grey;
+//   	font-size:1em;
+//   	margin:10px 0 0 0;
+//   	font-family:'TimesClassicText-Smallcaps-Medium';
+//   }
+//
+//   .data-block h1 {
+//   	font-weight:normal;
+//   	font-size:6em;
+//   	margin:12px 0 0 0;
+//   	font-family:'TimesModern-Regular';
+//   }
+// }
+//
+// .faceGrid {
+//   #wrapper {
+//   	overflow-y:scroll;
+//   	-webkit-overflow-scrolling: touch;
+//   }
+//
+//   #wrapper, #faces {
+//   	position:relative;
+//   	width:100%;
+//   }
+//
+//   #faces {
+//   	overflow:auto;
+//   }
+//
+//   .face-box {
+//   	display: inline-block;
+//   	position:relative;
+//   	float: left;
+//   	width:50%;
+//   	height:300px;
+//   	cursor:pointer;
+//   }
+//
+//   .face {
+//   	background-position:top center;
+//   	background-repeat:no-repeat;
+//   	background-size:cover;
+//   	width:100%;
+//   	height:100%;
+//   }
+//
+//   @media (orientation: portrait) {
+//   	.face {
+//   		background-position:center center;
+//   	}
+//   }
+//
+//   @media (orientation: landscape) {
+//   	.face {
+//   		background-position:top center;
+//   	}
+//   }
+//
+//   .heart, .hate {
+//   	position:absolute;
+//   	left:50%;
+//   	top:50%;
+//   	transform: translate(-50%, -50%);
+//   	width:30%;
+//   	height:30%;
+//   	background-image:url('assets/heart.jpg');
+//   	background-repeat: no-repeat;
+//   	background-size: contain;
+//   }
+//
+//   .heart {
+//   	background-image:url('assets/heart.jpg');
+//   }
+//
+//   .hate {
+//   	background-image:url('assets/hate.jpg');
+//   }
+// }
 
-  #wrapper {
-  	overflow-y:scroll;
-  	-webkit-overflow-scrolling: touch;
-  	position:relative;
-  	width:100%;
-  	color:white;
-  	background-color:#242424;
-  }
-
-  .worm-chart {
-  	margin-top:30px;
-  	height:60%;
-  	width:100%;
-  	background-color:red;
-  }
-
-  .data-block {
-  	margin-left:20px;
-  	margin-top:20px;
-  	width:30%;
-  	border-top:2px solid grey;
-  }
-
-  .data-block p {
-  	color:grey;
-  	font-size:1em;
-  	margin:10px 0 0 0;
-  	font-family:'TimesClassicText-Smallcaps-Medium';
-  }
-
-  .data-block h1 {
-  	font-weight:normal;
-  	font-size:6em;
-  	margin:12px 0 0 0;
-  	font-family:'TimesModern-Regular';
-  }
-}
-
-.faceGrid {
-  #wrapper {
-  	overflow-y:scroll;
-  	-webkit-overflow-scrolling: touch;
-  }
-
-  #wrapper, #faces {
-  	position:relative;
-  	width:100%;
-  }
-
-  #faces {
-  	overflow:auto;
-  }
-
-  .face-box {
-  	display: inline-block;
-  	position:relative;
-  	float: left;
-  	width:50%;
-  	height:300px;
-  	cursor:pointer;
-  }
-
-  .face {
-  	background-position:top center;
-  	background-repeat:no-repeat;
-  	background-size:cover;
-  	width:100%;
-  	height:100%;
-  }
-
-  @media (orientation: portrait) {
-  	.face {
-  		background-position:center center;
-  	}
-  }
-
-  @media (orientation: landscape) {
-  	.face {
-  		background-position:top center;
-  	}
-  }
-
-  .heart, .hate {
-  	position:absolute;
-  	left:50%;
-  	top:50%;
-  	transform: translate(-50%, -50%);
-  	width:30%;
-  	height:30%;
-  	background-image:url('assets/heart.jpg');
-  	background-repeat: no-repeat;
-  	background-size: contain;
-  }
-
-  .heart {
-  	background-image:url('assets/heart.jpg');
-  }
-
-  .hate {
-  	background-image:url('assets/hate.jpg');
-  }
-}
+// sorry josh.
