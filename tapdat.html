@@ -88,7 +88,11 @@
 </template>
 
 <template name="worm">
-  <div id="the-worm"></div>
+  <div id="chart_container">
+    <div id="y_axis"></div>
+    <div id="the-worm"></div>
+  </div>
+  <div id="legend"></div>
   {{allTheVotes}}
   {{> usersData}}
   {{> twitterStream}}

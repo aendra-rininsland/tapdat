@@ -1,6 +1,4 @@
-'use strict';
-
-var Votes = new Mongo.Collection('votes');
+Votes = new Mongo.Collection('votes');
 
 var parties = [
   {name: 'David Cameron', party: 'Conservative', abbr: 'Con', color: '#022397', photo: 'tory_square.jpg'},
@@ -15,10 +13,7 @@ var parties = [
 if (Meteor.isClient) {
   Session.setDefault('isFaces', true);
   Meteor.subscribe('onlineUsers');
-  Meteor.subscribe('recentVotes', function(){
-    var ts = new Date();
-    var a = Votes.find({'timestamp': {$gt: ts - 500, $lt: ts + 500} });
-  });
+  Meteor.subscribe('recentVotes');
 
   Template.body.helpers({
     questionnaireComplete: function(){
@@ -126,6 +121,45 @@ if (Meteor.isClient) {
     // });
     //
     // console.dir(cols);
+    // set up our data series with 150 random data points
+
+    var palette = new Rickshaw.Color.Palette();
+
+    var series = parties.map(function(v){
+      return {
+        name: v.party,
+        data: [{x: Date.now(), y: 0}],
+        color: v.color
+      }
+    }).sort(function(a, b){
+      return a.name < b.name;
+    });
+
+    var graph = new Rickshaw.Graph( {
+        element: document.querySelector("#the-worm"),
+        width: $(window).width() - 160,
+        height: $(window).height() * 0.45,
+        series: series,
+        offset: 'wiggle'
+    } );
+
+    var x_axis = new Rickshaw.Graph.Axis.Time( { graph: graph } );
+
+    var y_axis = new Rickshaw.Graph.Axis.Y( {
+      graph: graph,
+      orientation: 'left',
+      tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+      element: document.getElementById('y_axis'),
+    } );
+
+    var legend = new Rickshaw.Graph.Legend( {
+      element: document.querySelector('#legend'),
+      graph: graph
+    } );
+
+
+    graph.render();
+
   };
 
   Template.worm.helpers({
@@ -166,15 +200,15 @@ if (Meteor.isServer) {
     }
   });
 
-  Meteor.publish('onlineUsers', function() {
-    return Meteor.users.find({'status.online': true});
-  });
-
-  Meteor.publish('recentVotes', function(ts) {
-    return Votes.find({'timestamp': {$gt: ts - 500, $lt: ts + 500} });
-  });
-
-  Meteor.publish('allTheVotes', function() {
-    return Votes.find();
-  });
+  // Meteor.publish('onlineUsers', function() {
+  //   return Meteor.users.find({'status.online': true});
+  // });
+  //
+  // Meteor.publish('recentVotes', function(ts) {
+  //   return Votes.find({'timestamp': {$gt: ts - 500, $lt: ts + 500} });
+  // });
+  //
+  // Meteor.publish('allTheVotes', function() {
+  //   return Votes.find({}).count();
+  // });
 }
